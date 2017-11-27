@@ -11,5 +11,5 @@ import java.io.PrintStream;
 public class BMLogger {
 	public final static PrintStream out = System.out;
 	public final static PrintStream err = System.err;
-	public final static PrintStream debug = System.out;
+	public static PrintStream debug = null;
 }
