@@ -2,6 +2,7 @@ package parprog.homeproj.main;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CyclicBarrier;
 
 import parprog.homeproj.BMLogger.*;
 import parprog.homeproj.Particle.AParticle;
@@ -12,9 +13,11 @@ public class MotionMain {
 	public static void main(String[] args) {
 		ArgParser opts = new ArgParser(args);
 
-		Crystal pool = new Crystal(opts.getNumberOfNodes());
+		long curr = System.currentTimeMillis();
+		Crystal pool = new Crystal(opts.getNumberOfNodes(), opts.getNumOfParticles());
 		int numOfParticles = opts.getNumOfParticles();
-		List<Thread> particles = generateModeDependentParticles(opts, numOfParticles, pool);
+		CyclicBarrier barrier = new CyclicBarrier(opts.getNumOfParticles());
+		List<Thread> particles = generateModeDependentParticles(opts, numOfParticles, pool, barrier);
 
 		for(Thread particle: particles)
 			particle.start();
@@ -28,20 +31,22 @@ public class MotionMain {
 		}
 
 		pool.showSum();
+		BMLogger.out.println("Time of execution: " + (System.currentTimeMillis() - curr));
 	}
 
-	private static List<Thread> generateModeDependentParticles(ArgParser opts, int k, Crystal pool) {
+	private static List<Thread> generateModeDependentParticles(ArgParser opts, int k, Crystal pool,
+																CyclicBarrier barrier) {
 		List<Thread> result = new ArrayList<Thread>();
 		for(int i=0; i<k; i++) {
-			AParticle particle = generateSingleParticle(opts, pool);
+			AParticle particle = generateSingleParticle(opts, pool, barrier);
 			result.add(new Thread(particle));
 		}
 		return result;
 	}
 
-	private static AParticle generateSingleParticle(ArgParser opts, Crystal pool) {
+	private static AParticle generateSingleParticle(ArgParser opts, Crystal pool, CyclicBarrier barrier) {
 		if(opts.getMode().equals("iteration"))
-			return new IterationModeParticle(opts, pool);
-		else return new TimeModeParticle(opts, pool);
+			return new IterationModeParticle(opts, pool, barrier);
+		else return new TimeModeParticle(opts, pool, barrier);
 	}
 }

@@ -1,6 +1,8 @@
 package parprog.homeproj.Particle;
 
 import java.util.Random;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 import parprog.homeproj.main.ArgParser;
 import parprog.homeproj.main.Crystal;
@@ -9,8 +11,8 @@ public class IterationModeParticle extends AParticle {
 	private final Float p;
 	private final int iter_num;
 
-	public IterationModeParticle(ArgParser opts, Crystal pool) {
-		super(pool);
+	public IterationModeParticle(ArgParser opts, Crystal pool, CyclicBarrier barrier) {
+		super(pool, barrier);
 		p = opts.getProbability();
 		iter_num = opts.getIterationNum();
 	}
@@ -24,8 +26,14 @@ public class IterationModeParticle extends AParticle {
 			if (step < p)
 				 moveRight();
 			else moveLeft();
+			try {
+				barrier.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (BrokenBarrierException e) {
+				e.printStackTrace();
+			}
 		}
-		pool.collectData(this.getPosition());
 	}
 
 }

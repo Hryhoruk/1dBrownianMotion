@@ -28,9 +28,6 @@ public class ArgParser {
 					if(arg.equals("--help") || arg.equals("-h")) {
 						showHelpMessage();
 					}
-					else if(arg.equals("-dbstd")) {
-						BMLogger.debug = System.out;
-					}
 					else if(arg.startsWith("-it") || arg.startsWith("--iterationtime")) {
 						assert((mode==null || mode.equals("time")) && it==0);
 						mode = "time";
@@ -134,8 +131,6 @@ public class ArgParser {
 
 			BMLogger.out.println("Additional options include:");
 			BMLogger.out.println("  -h, --help         show this message.");
-			BMLogger.out.println("  -dbstd             write debug info on a screen.");
-			BMLogger.out.println("                     Debug info is disabled by default.");
 			System.exit(0);
 		}
 
